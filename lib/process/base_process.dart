@@ -1,8 +1,6 @@
-abstract class BaseProcess {
-  execute() { }
-}
+import 'package:app_design/utilities/bloc/process_bloc.dart';
 
-abstract class Process extends BaseProcess {
+abstract class Process extends ProcessEvent {
   T createProcess<T>(T process);
 }
 

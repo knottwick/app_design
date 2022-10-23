@@ -1,22 +1,19 @@
-import 'package:app_design/process/base_process.dart';
 import 'package:app_design/utilities/bloc/process_bloc.dart';
 
-abstract class TemplateProcess<TInput, TOutput> extends BaseProcess {
+class TemplateProcess<TInput, TOutput> extends ProcessEvent {
    
-   late TInput input;
-   late TOutput output;
+  late TInput input;
+  late TOutput output;
 
-   excute(TInput input) async {
-      this.input = input;
-      await execute();
-      return Success<TOutput>(this.output);
-   }
+  void set(TInput input) async {
+    this.input = input;
+  }
 
-   @override
-   execute() async {
-      super.execute();
-      await createOutput();
-   }
+  @override
+  execute() async {
+    super.execute();
+    await createOutput();
+  }
 
-   createOutput() { }
+  createOutput() { }
 }

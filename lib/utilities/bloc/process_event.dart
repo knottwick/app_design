@@ -1,9 +1,14 @@
 part of 'process_bloc.dart';
 
-abstract class ProcessEvent { }
-
-class Create<T> extends ProcessEvent {
-  late T input;
-  Create(this.input);
+abstract class ProcessEvent {
+  execute() { }
 }
 
+// class Create<T> extends ProcessEvent {
+//   late T inputs;
+//   Create(this.inputs);
+// }
+
+// class CreateProcess extends ProcessEvent {
+
+// }

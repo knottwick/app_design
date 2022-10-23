@@ -1,7 +1,6 @@
-import 'dart:developer';
-
 import 'package:app_design/process/authentication/process_1.dart';
 import 'package:app_design/process/authentication/process_2.dart';
+import 'package:app_design/process/authentication/process_3.dart';
 import 'package:app_design/process/base_process.dart';
 import 'package:app_design/utilities/bloc/process_bloc.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -38,20 +36,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    
-  }
-
-  void _incrementCounter() {
-    setState(() {
-    
-    });
-   
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,13 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Container(
-        
         child: buildProcess()
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       )
     );
   }
@@ -75,17 +53,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ProcessBloc<Process1>>(
-          create: (BuildContext context) { 
-            var process = ProcessBloc(Process1());
-            return process..add(Create(5));
-          }
+          create: (BuildContext context) => ProcessBloc(Process1())
         ),
         BlocProvider<ProcessBloc<Process2>>(
-          create: (BuildContext context) { 
-            var process = ProcessBloc(Process2());
-            return process..add(Create(1));
-          }
+          create: (BuildContext context) => ProcessBloc(Process2())
         ),
+        BlocProvider<ProcessBloc<Process3>>(
+          create: (BuildContext context) => ProcessBloc(Process3())
+        )
       ],
       child: const Center(
         child: Pages()
@@ -102,19 +77,32 @@ class Pages extends StatefulWidget {
 }
 
 class _Pages extends State<Pages> {
+
+  late ProcessManager _process;
+  
+  @override
+  void initState() {
+    super.initState();
+    _process = ProcessManager();
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    var process1 = _process.createProcess(Process1());
+    var process2 = _process.createProcess(Process2());
+    var process3 = _process.createProcess(Process3());
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         BlocBuilder<ProcessBloc<Process1>, ProcessState>(
           builder: (context, state) {
-            log(state.toString());
             if (state is Executing) {
               return const CircularProgressIndicator();
             }
-            else if (state is Success<String>) {
-              return Text(state.output);
+            else if (state is Success) {
+              return Text(process1.output);
             }
             else {
               return const SizedBox.shrink();
@@ -123,32 +111,56 @@ class _Pages extends State<Pages> {
         ),
         BlocBuilder<ProcessBloc<Process2>, ProcessState>(
           builder: (context, state) {
-            log(state.toString());
             if (state is Executing) {
               return const CircularProgressIndicator();
             }
-            else if (state is Success<String>) {
-              return Text(state.output);
+            else if (state is Success) {
+              return Text(process2.output);
             }
             else {
               return const SizedBox.shrink();
             }
           },
         ),
-        // Container(
-        //   color: Colors.green,
-        //   child: BlocBuilder<ProcessBloc<Process2>, ProcessState>(
-        //     builder: (context, state) {
-        //       if (state is ProcessExecuting) {
-        //         return const CircularProgressIndicator(color: Colors.red,);
-        //       }
-        //       else {
-        //         return const SizedBox.shrink();
-        //       }
-        //     },
-        //   )
-        // )
-        
+        BlocBuilder<ProcessBloc<Process3>, ProcessState>(
+          builder: (context, state) {
+            if (state is Executing) {
+              return const CircularProgressIndicator();
+            }
+            else if (state is Success) {
+              return Text(process3.output);
+            }
+            else {
+              return const SizedBox.shrink();
+            }
+          },
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+              onPressed: () async {
+                process1.set(5);
+                context.read<ProcessBloc<Process1>>().add(process1);
+              }, 
+              child: const Text("CLICK - 1")
+            ),
+            TextButton(
+              onPressed: () async {
+                process2.set(10);
+                context.read<ProcessBloc<Process2>>().add(process2);
+              }, 
+              child: const Text("CLICK - 2")
+            ),
+            TextButton(
+              onPressed: () async {
+                process3.set(2);
+                context.read<ProcessBloc<Process3>>().add(process3);
+              }, 
+              child: const Text("CLICK - 3")
+            ),
+          ],
+        )
       ]
     );
   }
